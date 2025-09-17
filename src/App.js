@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AppLayout from "./components/AppLayout";
 import SidePanel from "./components/SidePanel";
 import ChatWindow from "./components/ChatWindow";
-import { getSessions, getSessionMessages, toggleFavorite, createSession, deleteSession } from "./api/storage";
+import { getSessions, getSessionMessages, toggleFavorite, createSession, deleteSession, renameSession } from "./api/storage";
 
 export default function App() {
   const [sessions, setSessions] = useState([]);
@@ -23,7 +23,6 @@ export default function App() {
         setSelectedSessionId(sessionList[0].id);
       }
     })();
-    // eslint-disable-next-line
   }, []);
 
   // Fetch recent messages when session changes, using sessionStorage for caching
@@ -63,15 +62,24 @@ export default function App() {
 
   const handleDeleteSession = async (sessionId) => {
     if (!window.confirm("Are you sure you want to delete this session?")) return;
-    await deleteSession(sessionId); // <-- Make sure deleteSession is imported from your API
+    await deleteSession(sessionId);
     const sess = await getSessions();
     setSessions(sess.content || sess);
-    // Optionally reset selected session if deleted by mistake
     if (sessionId === selectedSessionId && (sess.content?.length || sess.length)) {
       setSelectedSessionId((sess.content || sess)[0]?.id || null);
     } else if (!(sess.content?.length || sess.length)) {
       setSelectedSessionId(null);
       setRecentMessages([]);
+    }
+  };
+
+  const handleRenameSession = async (sessionId, newTitle) => {
+    try {
+      await renameSession(sessionId, newTitle); // FIX: use correct function
+      const sess = await getSessions();
+      setSessions(sess.content || sess);
+    } catch (err) {
+      alert("Failed to rename session: " + err.message);
     }
   };
 
@@ -84,6 +92,7 @@ export default function App() {
           selectedSessionId={selectedSessionId}
           onToggleFavorite={handleToggleFavorite}
           onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRenameSession} // FIX: add this prop
           recentMessages={recentMessages}
           onSelectRecentMessage={handleSelectRecentMessage}
         />

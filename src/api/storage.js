@@ -26,13 +26,18 @@ export const deleteSession = async (sessionId) =>
   axios.delete(`${BASE_URL}/api/v1/sessions/${sessionId}`, { headers })
     .then(res => res.data);
 
-export const renameSession = async (sessionId, title) =>
-  axios.put(`${BASE_URL}/api/v1/sessions/${sessionId}`, { title }, { headers })
-    .then(res => res.data);
-
 export const toggleFavorite = async (sessionId) =>
   axios.put(`${BASE_URL}/api/v1/sessions/${sessionId}/favorite`, {}, { headers })
     .then(res => res.data);
+
+// --- RENAME SESSION (PATCH) ---
+// Use axios, include all headers!
+export const renameSession = async (sessionId, newTitle) =>
+  axios.patch(
+    `${BASE_URL}/api/v1/sessions/${sessionId}`,
+    { title: newTitle },
+    { headers }
+  ).then(res => res.data);
 
 // --- Messages ---
 export const getSessionMessages = (sessionId) =>
@@ -90,18 +95,4 @@ export const uploadDocument = (sessionId, file) => {
       headers: uploadHeaders
     })
     .then((res) => res.data);
-};
-
-const handleDeleteSession = async (sessionId) => {
-  if (!window.confirm("Are you sure you want to delete this session?")) return;
-  await deleteSession(sessionId);
-  const sess = await getSessions();
-  setSessions(sess.content || sess);
-  // Optionally reset selected session if deleted
-  if (sessionId === selectedSessionId && sess.length) {
-    setSelectedSessionId(sess[0].id);
-  } else if (sess.length === 0) {
-    setSelectedSessionId(null);
-    setMessages([]);
-  }
 };
