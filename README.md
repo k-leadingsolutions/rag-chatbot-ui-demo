@@ -10,7 +10,7 @@ A polished, Material-UI powered React frontend for chatting with a Retrieval-Aug
 - Mark/unmark sessions as favorite
 - Paginated session and chat history
 - Responsive, modern layout (Material-UI)
-- Chat with Haystack-powered RAG backend
+- Chat with Ollam RAG backend
 - Stores all messages and sessions in your storage microservice
 
 ---
